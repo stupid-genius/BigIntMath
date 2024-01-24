@@ -39,4 +39,15 @@ describe('BigIntMath', function(){
 			assert.ok(random >= min && random <= max);
 		}
 	});
+
+	it('should generate random large BigInts within specified range', function(){
+		const min = biMath.pow(biMath(2), biMath(1024))-biMath(1);
+		const max = biMath.pow(min, biMath(2))-biMath(1);
+		// console.log(`range (${min.toString(2).length}, ${max.toString(2).length})`);
+		for(let i = 0; i < 1000; ++i){
+			const random = biMath.random_bytes(min, max);
+			// console.log(random.toString(2).length/8, random);
+			assert.ok(random >= min && random <= max);
+		}
+	});
 });
