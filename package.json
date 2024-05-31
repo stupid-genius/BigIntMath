@@ -23,5 +23,8 @@
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
     "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "log-ng": "github:stupid-genius/log-ng"
   }
 }

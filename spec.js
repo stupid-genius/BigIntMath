@@ -1,5 +1,9 @@
 const {assert} = require('chai');
+const { default: Logger } = require('log-ng');
 const biMath = require('./BigIntMath');
+
+const logger = new Logger('spec.js');
+Logger.setLogLevel('error');
 
 describe('BigIntMath', function(){
 	it('should correctly calculate absolute value', function(){
@@ -43,10 +47,10 @@ describe('BigIntMath', function(){
 	it('should generate small BigInts within the specified range', function(){
 		const min = biMath.pow(biMath(2), biMath(8)) - biMath(1);
 		const max = biMath.pow(min, biMath(2)) - biMath(1);
-		// console.log(`range (${min.toString(2).length}, ${max.toString(2).length})`);
+		logger.debug(`range (${min.toString(2).length}, ${max.toString(2).length})`);
 		for(let i = 0; i < 1000; ++i){
 			const random = biMath.random_bytes(min, max);
-			// console.log(random.toString(2).length/8, random);
+			logger.debug(random.toString(2).length/8, random);
 			assert.ok(random >= min && random <= max);
 		}
 	});
@@ -54,10 +58,10 @@ describe('BigIntMath', function(){
 	it('should generate random large BigInts within specified range', function(){
 		const min = biMath(Number.MAX_SAFE_INTEGER);
 		const max = biMath(Number.MAX_SAFE_INTEGER * 2);
-		// console.log(`range (${min.toString(2).length}, ${max.toString(2).length})`);
+		logger.debug(`range (${min.toString(2).length}, ${max.toString(2).length})`);
 		for(let i = 0; i < 1000; ++i){
 			const random = biMath.random_bytes(min, max);
-			// console.log(random.toString(2).length/8, random);
+			logger.debug(random.toString(2).length/8, random);
 			assert.ok(random >= min && random <= max);
 		}
 	});
@@ -82,7 +86,7 @@ describe('chi squared', function(){
 		const numSamples = 1000;
 		let m = start;
 		const observed = Array.from({length: numSamples}, () => m++);
-		// console.log(observed);
+		logger.debug(observed);
 
 		chi2Test(1, observed);
 	});
@@ -96,8 +100,8 @@ describe('chi squared', function(){
 });
 
 function chiSquared(sequence, numBins){
-	// console.log('sequence:', sequence);
-	// console.log('numBins:', numBins);
+	logger.debug('sequence:', sequence);
+	logger.debug('numBins:', numBins);
 	if(!(numBins instanceof BigInt)){
 		numBins = BigInt(numBins);
 	}
@@ -105,20 +109,21 @@ function chiSquared(sequence, numBins){
 
 	const min = sequence[0];
 	const max = sequence[sequence.length - 1];
-	// console.log('min:', min, 'max:', max, 'range:', max - min);
+	logger.debug('min:', min, 'max:', max, 'range:', max - min);
 	const binSize = (max - min + 1n) / numBins;
-	// console.log('binSize:', binSize);
+	logger.debug('binSize:', binSize);
 
 	const observedFrequency = new Array(Number(numBins)+1).fill(0n);
-	// console.log('observedFrequency:', observedFrequency, observedFrequency.length, typeof observedFrequency[0]);
+	logger.debug('observedFrequency:', observedFrequency, observedFrequency.length, typeof observedFrequency[0]);
 	for(let i = 0; i < sequence.length; i++){
 		// figure out which bin the value belongs to
 		const bin = Number((sequence[i] - min) / binSize);
 		try{
 			observedFrequency[bin] += 1n;
 		}catch(e){
-			// console.log('sequence:', sequence[i]);
-			// console.log('bin:', bin, typeof bin, 'observedFrequency[bin]:', observedFrequency[bin], typeof observedFrequency[bin]);
+			logger.error(e);
+			logger.debug('sequence:', sequence[i]);
+			logger.debug('bin:', bin, typeof bin, 'observedFrequency[bin]:', observedFrequency[bin], typeof observedFrequency[bin]);
 			assert(false);
 		}
 	}
@@ -131,7 +136,7 @@ function chiSquared(sequence, numBins){
 		chiSquare += ((deviation ** 2n)) / (expectedFrequency);
 	}
 
-	// console.log('chiSquare:', chiSquare);
+	logger.debug('chiSquare:', chiSquare);
 	return chiSquare;
 }
 

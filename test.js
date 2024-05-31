@@ -1,20 +1,65 @@
-const karma = require('karma');
-const app = require('./testServer');
+const Karma = require('karma');
+const Logger = require('log-ng');
+const Mocha = require('mocha');
+const path = require('path');
 
-require('./server.spec.js');
-const server = app.listen(3000, 'localhost', async () => {
-	console.log('Test server started');
-	try{
-		const config = karma.config.parseConfig(__dirname + '/karma.server.conf.js', {});
-		const server = new karma.Server(config);
+Logger({logLevel: 'info', logFile: 'test.log'});
+const logger = new Logger(path.basename(__filename));
+
+const app = require('./testServer');
+const mocha = new Mocha();
+
+function runServerTests(specPath){
+	console.log('Starting Mocha tests');
+	mocha.addFile(specPath);
+	mocha.run((err) => {
+		console.error(err);
+	});
+}
+
+function runBrowserTests(configPath){
+	return new Promise((res, rej) => {
+		logger.info('Starting Karma tests');
+		const config = Karma.config.parseConfig(configPath, {});
+		const server = new Karma.Server(config, (exitCode) => {
+			if(exitCode === 0){
+				logger.info('Karma tests completed');
+				res();
+			}else{
+				rej(new Error(`Karma tests failed with exit code ${exitCode}`));
+			}
+		});
+
+		server.on('browser_log', (browser, log, type) => {
+			logger.info(`Browser log [${type}]: ${log} (${browser})`);
+		});
+
+		server.on('browser_error', (browser, error) => {
+			logger.error(`Error in browser: ${error} (${browser})`);
+		});
+
+		server.on('run_complete', (browser) => {
+			logger.debug(`Run complete: ${JSON.stringify(browser, null, 2)}`);
+		});
+
 		server.start();
-		await new Promise(resolve => server.on('run_complete', resolve));
-		console.log('Karma tests completed successfully');
+	});
+};
+
+const testServer = app.listen(3000, 'localhost', async () => {
+	try{
+		logger.info('Test server started');
+
+		runServerTests('./server.spec.js');
+
+		await runBrowserTests(__dirname + '/karma.server.conf.js', {});
+
+		logger.info('All tests completed');
 	}catch(error){
-		console.error('Error running Karma tests:', error);
+		logger.error('Error running tests:', error);
 	}finally{
-		server.close(() => {
-			console.log('Test server closed');
+		testServer.close(() => {
+			logger.info('Test server closed');
 		});
 	}
 });
