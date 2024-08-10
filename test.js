@@ -10,10 +10,10 @@ const app = require('./testServer');
 const mocha = new Mocha();
 
 function runServerTests(specPath){
-	console.log('Starting Mocha tests');
+	logger.info('Starting Mocha tests');
 	mocha.addFile(specPath);
 	mocha.run((err) => {
-		console.error(err);
+		logger.error(err);
 	});
 }
 

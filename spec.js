@@ -3,7 +3,7 @@ const { default: Logger } = require('log-ng');
 const biMath = require('./BigIntMath');
 
 const logger = new Logger('spec.js');
-Logger.setLogLevel('error');
+// Logger.setLogLevel('error');
 
 describe('BigIntMath', function(){
 	it('should correctly calculate absolute value', function(){
@@ -55,7 +55,7 @@ describe('BigIntMath', function(){
 		}
 	});
 
-	it('should generate random large BigInts within specified range', function(){
+	it('should generate large BigInts within specified range', function(){
 		const min = biMath(Number.MAX_SAFE_INTEGER);
 		const max = biMath(Number.MAX_SAFE_INTEGER * 2);
 		logger.debug(`range (${min.toString(2).length}, ${max.toString(2).length})`);

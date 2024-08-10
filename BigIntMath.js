@@ -9,10 +9,10 @@ const logger = new Logger('BigIntMath.js');
 
 function flyweightCache(num){
 	if(flyweightCache[num] !== undefined){
-		logger.debug(`returning ${num}`);
+		logger.silly(`returning ${num}`);
 		return flyweightCache[num];
 	}
-	logger.debug(`creating ${num}`);
+	logger.silly(`creating ${num}`);
 	const biVal = BigInt(num);
 	Object.defineProperty(flyweightCache, num, {
 		get: function(){
