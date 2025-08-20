@@ -1,9 +1,10 @@
 const {assert} = require('chai');
-const { default: Logger } = require('log-ng');
-const biMath = require('./BigIntMath');
+const Logger = require('log-ng').default;
+Logger.setLogLevel('info');
+
+const biMath = require('./BigIntMath.js');
 
 const logger = new Logger('spec.js');
-// Logger.setLogLevel('error');
 
 describe('BigIntMath', function(){
 	it('should correctly calculate absolute value', function(){
@@ -50,7 +51,7 @@ describe('BigIntMath', function(){
 		logger.debug(`range (${min.toString(2).length}, ${max.toString(2).length})`);
 		for(let i = 0; i < 1000; ++i){
 			const random = biMath.random_bytes(min, max);
-			logger.debug(random.toString(2).length/8, random);
+			logger.silly(random.toString(2).length/8, random);
 			assert.ok(random >= min && random <= max);
 		}
 	});
@@ -61,7 +62,7 @@ describe('BigIntMath', function(){
 		logger.debug(`range (${min.toString(2).length}, ${max.toString(2).length})`);
 		for(let i = 0; i < 1000; ++i){
 			const random = biMath.random_bytes(min, max);
-			logger.debug(random.toString(2).length/8, random);
+			logger.silly(random.toString(2).length/8, random);
 			assert.ok(random >= min && random <= max);
 		}
 	});

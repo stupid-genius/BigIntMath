@@ -1,9 +1,4 @@
-let Logger;
-if(typeof window === 'undefined'){
-	Logger = require('log-ng');
-}else{
-	Logger = require('log-ng').default;
-}
+const Logger = require('log-ng').default;
 
 const logger = new Logger('BigIntMath.js');
 
@@ -23,10 +18,8 @@ function flyweightCache(num){
 }
 
 //chauffage
-[0, 1, 2, 3, 8, 20, 128].forEach(flyweightCache);
+[0, 1, 2, 3, 8].forEach(flyweightCache);
 
-// this consumes ~120k of memory; set it lower if not needed and you are memory constrained
-const maxBigInt = flyweightCache[2]**(flyweightCache[2]**flyweightCache[20]-flyweightCache[1]);
 const biMath = flyweightCache;
 Object.defineProperties(biMath, {
 	abs: {
@@ -39,7 +32,18 @@ Object.defineProperties(biMath, {
 		value: (v, ...values) => values.reduce((acc, cur) => cur < acc ? cur : acc, v)
 	},
 	pow: {
-		value: (base, exp, mod = maxBigInt) => {
+		value: (base, exp, mod) => {
+			if(mod === undefined){
+				let result = flyweightCache[1];
+				while(exp > flyweightCache[0]){
+					if(exp & flyweightCache[1]){
+						result *= base;
+					}
+					base *= base;
+					exp = exp / flyweightCache[2];
+				}
+				return result;
+			}
 			let result = flyweightCache[1];
 
 			while(exp > flyweightCache[0]){
@@ -58,10 +62,10 @@ Object.defineProperties(biMath, {
 	},
 	random_bytes: {
 		value: (min, max) => {
-			if(!(min instanceof BigInt)){
+			if(typeof min !== 'bigint'){
 				min = BigInt(min);
 			}
-			if(!(max instanceof BigInt)){
+			if(typeof max !== 'bigint'){
 				max = BigInt(max);
 			}
 			const range = max - min;
