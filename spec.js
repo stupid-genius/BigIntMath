@@ -1,4 +1,4 @@
-const {assert} = require('chai');
+const {assert, expect} = require('chai');
 const Logger = require('log-ng').default;
 Logger.setLogLevel('info');
 
@@ -77,6 +77,15 @@ describe('BigIntMath', function(){
 		// https://cdn.scribbr.com/wp-content/uploads/2022/05/chi-square-distribution-table.png
 		chi2Test(50, generatedValues);
 	});
+
+	it('should generate cryptographically secure random BigInts', function(){
+		for(let bits = 8; bits <= 512; bits += 8){
+			const randomBigInt = biMath.random_crypto(bits);
+			const bitLength = randomBigInt.toString(2).length;
+			logger.silly(`Generated random crypto BigInt with ${bitLength} bits:`, randomBigInt);
+			assert.ok(bitLength === bits);
+		}
+	});
 });
 
 describe('chi squared', function(){
@@ -133,8 +142,11 @@ function chiSquared(sequence, numBins){
 
 	let chiSquare = 0n;
 	for(let i = 0; i < numBins; i++){
-		const deviation = observedFrequency[i] - expectedFrequency;
-		chiSquare += ((deviation ** 2n)) / (expectedFrequency);
+		// const deviation = observedFrequency[i] - expectedFrequency;
+		// chiSquare += ((deviation ** 2n)) / (expectedFrequency);
+
+		const deviation = Number(observedFrequency[i] - expectedFrequency);
+		chiSquare = deviation**2 / Number(expectedFrequency);
 	}
 
 	logger.debug('chiSquare:', chiSquare);

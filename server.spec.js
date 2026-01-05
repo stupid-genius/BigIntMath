@@ -1,6 +1,7 @@
-const {assert} = require('chai');
+const {assert, expect} = require('chai');
 const Logger = require('log-ng');
-const biMath = require('./BigIntMath');
+
+const biMath = require('./BigIntMath.js');
 
 Logger.setLogLevel('error');
 const logger = new Logger('spec.js');
@@ -75,6 +76,15 @@ describe('BigIntMath', function(){
 
 		// https://cdn.scribbr.com/wp-content/uploads/2022/05/chi-square-distribution-table.png
 		chi2Test(50, generatedValues);
+	});
+
+	it('should generate cryptographically secure random BigInts', function(){
+		for(let bits = 8; bits <= 512; bits += 8){
+			const randomBigInt = biMath.random_crypto(bits);
+			const bitLength = randomBigInt.toString(2).length;
+			logger.silly(`Generated random crypto BigInt with ${bitLength} bits:`, randomBigInt);
+			assert.ok(bitLength === bits);
+		}
 	});
 });
 

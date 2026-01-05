@@ -5,8 +5,9 @@
   "main": "BigIntMath.js",
   "scripts": {
     "debug": "DEBUG_MODE=true karma start --inspect",
-    "mocha": "mocha",
-    "test": "karma start",
+	"karma": "karma start",
+	"mocha": "mocha --require test.js server.spec.js",
+	"test": "npm run mocha; npm run karma",
     "testServer": "node testServer.js"
   },
   "author": "Stupid Genius Software",
